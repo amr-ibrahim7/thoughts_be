@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
       default:
-        "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
+        "https://res.cloudinary.com/dizpv8zem/image/upload/v1749733971/3551739_ddjfzb.jpg",
     },
   },
   { timestamps: true }
