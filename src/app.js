@@ -24,5 +24,5 @@ app.use("/posts", postsRouter);
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`running!! on port ${port}`);
+  console.log(`running!! on port ${PORT}`);
 });

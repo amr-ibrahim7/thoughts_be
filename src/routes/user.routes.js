@@ -1,12 +1,11 @@
 import express from "express";
 import {
-  deleteUser,
-  getUser,
-  loginUser,
-  logoutUser,
-  registerUser,
-  updateUser,
-  uploadProfilePicture,
+    deleteUser,
+    getUser,
+    loginUser,
+    registerUser,
+    updateUser,
+    uploadProfilePicture,
 } from "../controllers/user.controller.js";
 
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
@@ -23,7 +22,6 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/logout", logoutUser);
 
 router.patch("/update", isLoggedIn, updateUser);
 
