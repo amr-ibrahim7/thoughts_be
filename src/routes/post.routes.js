@@ -2,12 +2,14 @@ import upload from "../middleware/fileUpload.js";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 
 import {
-    allPost,
-    createPost,
-    deletePost,
-    postByAuthor,
-    postByCategory,
-    updatePost,
+  addComment,
+  allPost,
+  createPost,
+  deleteComment,
+  deletePost,
+  postByAuthor,
+  postByCategory,
+  updatePost,
 } from "../controllers/post.controller.js";
 
 import express from "express";
@@ -24,5 +26,8 @@ router.delete("/delete", isLoggedIn, deletePost);
 router.get("/category", postByCategory);
 
 router.get("/author", postByAuthor);
+
+router.post("/:postId/comments", isLoggedIn, addComment);
+router.delete("/:postId/comments/:commentId", isLoggedIn, deleteComment);
 
 export default router;

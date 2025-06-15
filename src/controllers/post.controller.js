@@ -9,7 +9,8 @@ export const allPost = async (req, res) => {
       try {
         const post = await postModel
           .findById(postId)
-          .populate("author", "name profilePicture");
+          .populate("author", "name profilePicture")
+          .populate("comments.user", "name profilePicture");
         if (post) {
           return res.json(post);
         }
@@ -26,6 +27,7 @@ export const allPost = async (req, res) => {
         const posts = await postModel
           .find()
           .populate("author", "name profilePicture")
+          .populate("comments.user", "name profilePicture")
           .sort({ createdAt: -1 })
           .skip((pageNumber - 1) * limitNumber)
           .limit(limitNumber);
@@ -39,6 +41,7 @@ export const allPost = async (req, res) => {
         const posts = await postModel
           .find()
           .populate("author", "name profilePicture")
+          .populate("comments.user", "name profilePicture")
           .sort({ createdAt: -1 });
 
         return res.json(posts);
@@ -239,6 +242,105 @@ export const postByAuthor = async (req, res) => {
 
     res.json(posts);
   } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error!",
+    });
+  }
+};
+export const addComment = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { comment } = req.body;
+    const userId = req.user._id;
+
+    if (!comment || comment.trim() === "") {
+      return res.status(400).json({
+        status: "error",
+        message: "Comment cannot be empty!",
+      });
+    }
+
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found!",
+      });
+    }
+
+    post.comments.push({
+      user: userId,
+      comment: comment.trim(),
+    });
+
+    await post.save();
+
+    const updatedPost = await postModel
+      .findById(postId)
+      .populate("comments.user", "name profilePicture")
+      .populate("author", "name profilePicture");
+
+    res.status(201).json({
+      status: "success",
+      message: "Comment added successfully!",
+      data: updatedPost.comments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error!",
+    });
+  }
+};
+
+export const deleteComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+    const userId = req.user._id;
+
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found!",
+      });
+    }
+
+    const commentIndex = post.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
+
+    if (commentIndex === -1) {
+      return res.status(404).json({
+        status: "error",
+        message: "Comment not found!",
+      });
+    }
+
+    const comment = post.comments[commentIndex];
+    if (
+      comment.user.toString() !== userId.toString() &&
+      post.author.toString() !== userId.toString()
+    ) {
+      return res.status(403).json({
+        status: "error",
+        message: "Not authorized to delete this comment!",
+      });
+    }
+
+    post.comments.splice(commentIndex, 1);
+    await post.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Comment deleted successfully!",
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({
       status: "error",
       message: "Internal server error!",

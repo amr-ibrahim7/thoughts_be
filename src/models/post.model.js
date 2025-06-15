@@ -15,6 +15,23 @@ const postSchema = new mongoose.Schema(
       default:
         "https://res.cloudinary.com/dizpv8zem/image/upload/v1749395540/blog_xsvkf1.jpg",
     },
+    comments: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        comment: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
